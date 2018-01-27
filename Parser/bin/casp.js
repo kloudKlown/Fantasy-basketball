@@ -18,7 +18,7 @@ if (date.length == 7){
 }
 console.log(date);
 
-var url = 'http://www.fantasylabs.com/nba/player-models/?date=' + date
+var url = 'https://www.fantasylabs.com/nba/player-models/?date=' + date
 
 console.log(url)
 
@@ -43,7 +43,7 @@ casper.thenOpen(url, function() {
 	var i = 1;
 
 	
-	casper.wait(6000, function () {
+	casper.wait(3000, function () {
 
   	this.capture('foo.jpg', undefined, {
 	         format: 'jpg',
@@ -51,7 +51,7 @@ casper.thenOpen(url, function() {
     	});
 
 	 var data = this.page.content;
-	 fs.write('ALL.html', data, 'w');  
+	 fs.write('C:/users/suhas/documents/nba/parser/bin/ALL.html', data, 'w');  
 	});
 
      

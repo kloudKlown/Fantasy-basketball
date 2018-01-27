@@ -5,19 +5,20 @@ from BeautifulSoup  import BeautifulSoup
 import time
 from datetime import datetime, timedelta
 
-
-w = open('All_NBA_17.csv','ab+')
-casp  = 'del All_NBA_17.csv'
+casp  = 'del C:\\Users\\suhas\\Documents\\NBA\Parser\\bin\\All_NBA_17.csv'
 
 os.system(casp)
 
-for each in range(0,40):
-	casp  = 'casperjs.exe casp.js --date=' + str((datetime.now()  - timedelta(days = each*1)).strftime("%m%d%Y"))
+w = open('C:\\Users\\suhas\\Documents\\NBA\Parser\\bin\\All_NBA_17.csv','ab+')
+
+
+for each in range(1,100):
+	casp  = 'C:\\users\\suhas\\documents\\nba\parser\\bin\\casperjs.exe c:\\users\\suhas\\documents\\nba\parser\\bin\\casp.js --date=' + str((datetime.now()  - timedelta(days = each*1)).strftime("%m%d%Y"))
 	print casp
 	os.system(casp)
 
 	time.sleep(10)
-	soup = BeautifulSoup(open("ALL.html"))
+	soup = BeautifulSoup(open("C:\\Users\\suhas\\Documents\\NBA\Parser\\bin\\ALL.html"))
 
 	day = ""
 	for allDivs in soup.findAll('input',{'class': re.compile(r'.*date-picker.*') }):
@@ -79,15 +80,15 @@ for each in range(0,40):
 		w.write(text)
 		text = day + ','
 
-	os.system('del ALL.html')
+	os.system('del C:\\Users\\suhas\\Documents\\NBA\Parser\\bin\\ALL.html')
 
 w.close()
-casp  = 'casperjs.exe dova.js'
+casp  = 'C:\\Users\\suhas\\Documents\\NBA\Parser\\bin\\casperjs.exe C:\\Users\\suhas\\Documents\\NBA\Parser\\bin\\dova.js'
 print casp
 os.system(casp)
 
 
 
-casp  = 'python NBA_dvoa.py'
+casp  = 'python C:\\Users\\suhas\\Documents\\NBA\Parser\\bin\\NBA_dvoa.py'
 print casp
 os.system(casp)

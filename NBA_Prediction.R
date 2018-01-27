@@ -12,9 +12,10 @@ library(stringdist)
 localH2O <- h2o.init()
 All_16_Combined = read.csv('All_16_Combined.csv')
 All_17 = read.csv('All_NBA_17.csv', header = FALSE)
+TT = read.csv('All_NBA_17_Today.csv', header = FALSE)
 Position = read.csv('PlayerPosition_17.csv')
 Dvoa = read.csv('NewOffense_Combined_17.csv')
-DateCheck = "2017-11-18"
+DateCheck = "2018-01-25"
 
 ####################### 16 part
 
@@ -76,6 +77,17 @@ colnames(All_17) = c("Date","B1","B2","Rating","Player","Pos","Salary","Min","Ma
                      "Points_Touch","Touches","S_B","B2B","Rest","Pts","Opp Pts","delta","Spread",
                      "O_U","Spread_per","PPG","Change","Consistency",
                      "Upside","Duds","Count","YPPG","YPlus_Minus","YChange","YConsistency","YUpside","YDuds","YCount","B5")
+
+########## 17 
+colnames(TT) = c("Date","B1","B2","Rating","Player","Pos","Salary","Min","Max","Team",
+                     "Opp","Proj","Ceiling","Floor","Proj_Plus_Minus","Pts_Sal","Usg Proj","Min Proj",
+                     "Own1","Own2","Imp Pts","Act Pts","FP_Min","PF_Min-M","PER",
+                     "Usage","Pro","My","Bargain","Opp_Plus_Minus","PaceD","Refs","TS_Per","Fouls_36",
+                     "Points_Touch","Touches","S_B","B2B","Rest","Pts","Opp Pts","delta","Spread",
+                     "O_U","Spread_per","PPG","Change","Consistency",
+                     "Upside","Duds","Count","YPPG","YPlus_Minus","YChange","YConsistency","YUpside","YDuds","YCount","B5")
+
+All_17 = rbind(All_17, TT)
 
 All_17[All_17 == '&nbsp;'] <- 0
 All_17["Ref1"] = 0
@@ -186,6 +198,7 @@ Today_Not =  subset(Today, Today$Player %nin% Today2$Player)
 Today_Not["ActualPos"] = gsub("/.*", "", Today_Not$Pos)
 
 Today2 = rbind(Today_Not, Today2)
+levels(Dvoa$Opp)[levels(Dvoa$Opp)=="PHO"] <- "PHX"
 Today2 = merge(Today2, Dvoa, by = c("Opp","ActualPos") )
 
 
@@ -318,10 +331,6 @@ plot(spearmanP)
 abline(h=0.3)
 
 
-
-
-
-
 ################################## PLayer BY player Prediction
 # DateCheck = "2017-11-04"
 All_16 = TempAll_16
@@ -332,9 +341,14 @@ Data_Cleaned = All_16[,c("Player","Team","Opp","Pos","Date","Rating","Salary","P
                          "O_U","Spread_per","PPG","Consistency",
                          "Upside","Duds","Count","YPPG","YPlus_Minus","YConsistency","YUpside","YDuds","YCount","PTS","REB","STL","BLK" )]
 Data_Cleaned = unique(Data_Cleaned)
-Data_Cleaned_Test = subset(Data_Cleaned, as.Date(Data_Cleaned$Date) == as.Date(DateCheck))
+Data_Cleaned_Test = subset(Data_Cleaned, ( as.Date(Data_Cleaned$Date) == as.Date(DateCheck) ) )
 
 Data_Cleaned_Train = subset(Data_Cleaned, as.Date(Data_Cleaned$Date) < as.Date(DateCheck))
+
+######
+ # Data_Cleaned_Test = subset(Data_Cleaned_Test, as.character(Data_Cleaned_Test$Player) == "Lou Williams")
+ # Data_Cleaned_Test$Rating = 81.1
+##
 
 playerNames = unique(Data_Cleaned_Test$Player)
 
@@ -344,13 +358,14 @@ Results = data.frame( RFPred = numeric(), Xgb = numeric(), Name = factor(), Pos 
                       Pts = numeric(), DNNPer = numeric(), DNN = numeric(),xgbPLUSMINUS = numeric(),
                       RFPLUSMINUS = numeric())
 
-for (each in 1:length(playerNames)){
+for (each in 30:length(playerNames)){
   Data_Cleaned_Test = subset(Data_Cleaned, Data_Cleaned$Date == DateCheck 
                              & Data_Cleaned$Player == as.character(playerNames[each]) )
 
   Data_Cleaned_Train = subset(Data_Cleaned, Data_Cleaned$Date != DateCheck
                               & Data_Cleaned$Player == as.character(playerNames[each]) )
   print (playerNames[each])
+  print (each)
   ### This ensures atleast 1 row of data exists for prediction
   if (nrow(Data_Cleaned_Test) < 1 ){
     next
@@ -365,12 +380,10 @@ for (each in 1:length(playerNames)){
     )
    
   }
-  
+
   if (nrow(Data_Cleaned_Train) < 15){
     next
   }
-  
-  
   
   #### People to skip
   if (playerNames[each] == "Kay Felder" & playerNames[each] == "Ian Mahinmi" & playerNames[each] == "Jodie Meeks"){
@@ -462,7 +475,7 @@ for (each in 1:length(playerNames)){
     y=response,
     nfold = 5,
     #activation="Rectifier",  ## default
-    hidden=c(300,300,200,100),       ## default: 2 hidden layers with 200 neurons each
+    hidden=c(300,100),       ## default: 2 hidden layers with 200 neurons each
     variable_importances=T,
     epochs = 5,
     categorical_encoding = "OneHotInternal"
@@ -559,6 +572,7 @@ for (each in 1:length(playerNames)){
   
 }
 
+Results
 
 Backup = Results
 
@@ -672,8 +686,9 @@ for(each in 1:nrow(Results)){
 
 
  # unique(Results$Name)
+Results = unique(Results)
 
-write.csv(Results, file = "NBA_Test_v11_17_18.csv")
+write.csv(Results, file = "NBA_Test_v01_25_2018.csv")
 
 ############### exp#####################
 
